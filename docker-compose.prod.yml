@@ -1,0 +1,63 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile.prod
+    command: daphne -b 0.0.0.0 -p 800 app.asgi:application
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    expose:
+      - 8000
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - SQL_ENGINE=${SQL_ENGINE}
+      - SQL_DATABASE=${SQL_DATABASE}
+      - SQL_USER=${SQL_USER}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_HOST=${SQL_HOST}
+      - SQL_PORT=${SQL_PORT}
+      - DATABASE=${DATABASE}
+      - MEDIA_SITE_URL=${MEDIA_SITE_URL}
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    restart: always
+    hostname: ${SQL_HOST}
+    environment:
+      - MYSQL_DATABASE=${SQL_DATABASE}
+      - MYSQL_USER=${SQL_USER}
+      - MYSQL_PASSWORD=${SQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${SQL_PASSWORD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - my-db:/var/lib/mysql
+
+  redis:
+    image: "redis:alpine"
+    hostname: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - "6380"
+    volumes:
+      - type: volume
+        source: redis-data
+        target: /data
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  my-db:
+  static_volume:
