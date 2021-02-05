@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import User, Rule
 
-# Register your models here.
+admin.site.register(Rule)
+admin.site.register(User)

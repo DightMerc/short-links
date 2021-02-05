@@ -1,4 +1,4 @@
-"""app URL Configuration
+"""web URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
@@ -18,8 +18,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('web.urls')),
+from . import views
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns = [
+    path('', views.BaseView.as_view()),
+    path('<str:short_url>/', views.RedirectView.as_view())
+]
