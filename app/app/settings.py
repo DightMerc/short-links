@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_apscheduler',
     'corsheaders',
     'rest_framework',
     'crispy_forms',
@@ -151,5 +152,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
 REDIS_DB = int(os.environ.get("REDIS_DB", 0))
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
+RULE_TIME = int(os.environ.get("RULE_TIME", "redis"))

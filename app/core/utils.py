@@ -2,7 +2,7 @@ from django.conf import settings
 import logging
 
 import redis
-
+import time
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +20,9 @@ class RedisCache():
 
     def get(self, key):
         try:
-            logger.error(f'get: {self.engine.get(key).decode("utf-8")}')
             return self.engine.get(key).decode("utf-8")
         except Exception as e:
             return ''
+
+    def delete(self, key):
+        self.engine.delete(key)

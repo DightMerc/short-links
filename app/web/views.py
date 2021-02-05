@@ -2,14 +2,16 @@ from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponseRedirect, HttpResponse
 
+from django.core.paginator import Paginator
+
 from core import models
+from core import utils
 from . import forms
 
 import logging
 import hashlib
 from datetime import datetime
 
-from core import utils
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,10 @@ class BaseView(View):
         user_instance, created = models.User.objects.get_or_create(session_id=user_id)
         user_rules = user_instance.rules.filter(active=True).order_by('-id')
 
+        paginator = Paginator(user_rules, 5)
+        page = int(request.GET.get('page')) if request.GET.get('page') else 1
+        user_rules = paginator.page(page if page <= paginator.num_pages else paginator.num_pages)
+
         form = forms.RuleForm()
 
         return render(
@@ -35,7 +41,7 @@ class BaseView(View):
             'web/index.html',
             {
                 'form': form,
-                'rules': user_rules,
+                'page': user_rules,
                 'hostname': request.META['HTTP_HOST']
 
             }
@@ -82,6 +88,11 @@ class BaseView(View):
                     info_message = f'Ссылка с таким сокращением ({form.cleaned_data["short_url"]}) уже существует. Измените сокращение'
 
         user_rules = user_instance.rules.filter(active=True).order_by('-id')
+
+        paginator = Paginator(user_rules, 5)
+        page = int(request.GET.get('page')) if request.GET.get('page') else 1
+        user_rules = paginator.page(page if page <= paginator.num_pages else paginator.num_pages)
+
         form = forms.RuleForm()
 
         return render(
@@ -89,7 +100,7 @@ class BaseView(View):
             'web/index.html',
             {
                 'form': form,
-                'rules': user_rules,
+                'page': user_rules,
                 'hostname': request.META['HTTP_HOST'],
                 'info': info,
                 'info_message': info_message
@@ -115,6 +126,7 @@ class RedirectView(View):
 
         url = cache.get(short_url)
         if url != '':
+
             return HttpResponseRedirect(url)
         else:
             if models.Rule.objects.filter(short_url=short_url, active=True).exists():
