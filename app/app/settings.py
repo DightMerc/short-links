@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'core',
     'web',
-    'api'
 ]
 
 

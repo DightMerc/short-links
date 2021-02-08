@@ -18,6 +18,21 @@ logger = logging.getLogger(__name__)
 
 class BaseView(View):
 
+    """
+    Main Page View
+
+    Allows two methods: get, post.
+    - get method:
+        renders index.html with rules of current session based user and new rule form.
+        If user does not exist creates new session based user with MD5 hashed time of now
+        as user unique id.
+
+        ?page= int param is using for pagination.
+        If page param > current user rules page count returns the last page.
+    - post method:
+        get data from page and creates new rule object
+    """
+
     def get(self, request):
 
         if request.session.get('user', False):
@@ -110,6 +125,11 @@ class BaseView(View):
 
 def CreateRule(url, short_url):
 
+    """
+    Main Create Rule method.
+    short_url - new rule str short_url
+    """
+
     rule = models.Rule()
     rule.url = url
     rule.short_url = short_url
@@ -119,6 +139,15 @@ def CreateRule(url, short_url):
 
 
 class RedirectView(View):
+
+    """
+    Redirect View
+
+    Allows get method:
+        Redirects to cureent Rule url.
+        Cache is used for redis based caching.
+        If Rule not found renders 404.html 
+    """
 
     def get(self, request, short_url):
 

@@ -17,9 +17,15 @@ from core.utils import RedisCache
 logger = logging.getLogger(__name__)
 
 
-def my_job():
+def rule_checker():
+
+    """
+    Deactivates outdated rules
+    """
+
     cache = RedisCache()
     time = settings.RULE_TIME
+
     for rule in Rule.objects.filter(active=True):
         if (timezone.now() - rule.created_at).seconds >= time:
             rule.active = False
@@ -29,7 +35,6 @@ def my_job():
             logger.error(f'rule deactivated: {rule.id}')
 
 def delete_old_job_executions(max_age=604_800):
-    """This job deletes all apscheduler job executions older than `max_age` from the database."""
     DjangoJobExecution.objects.delete_old_job_executions(max_age)
 
 
@@ -41,13 +46,13 @@ class Command(BaseCommand):
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
-            my_job,
+            rule_checker,
             trigger=CronTrigger(second="*/10"),  # Every 10 seconds
-            id="my_job",  # The `id` assigned to each job MUST be unique
+            id="rule_checker",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job 'my_job'.")
+        logger.info("Added job 'rule_checker'.")
 
         scheduler.add_job(
             delete_old_job_executions,

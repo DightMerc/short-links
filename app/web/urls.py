@@ -21,6 +21,9 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
+    # Main Page
     path('', views.BaseView.as_view()),
+
+    # Redirect View. Redirects to URL from Rule Object
     path('<str:short_url>/', views.RedirectView.as_view())
 ]

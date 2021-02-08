@@ -45,6 +45,9 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_DB=${REDIS_DB}
       - RULE_TIME=${RULE_TIME}
+    depends_on:
+      - db
+      - web
   db:
     image: mysql:5.7
     restart: always
