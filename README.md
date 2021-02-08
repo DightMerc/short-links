@@ -6,6 +6,7 @@ SHORT LINKS Project
  - Python
  - Django
  - Nginx
+ - Redis
  - MySQL
  
 ### Docker
